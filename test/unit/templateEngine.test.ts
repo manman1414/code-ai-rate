@@ -84,6 +84,18 @@ describe('templateEngine', () => {
     assert.include(html, 'src/app.ts');
   });
 
+  it('toHtml resolves template from extension dist folder', () => {
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'code-ai-rate-ext-'));
+    const distDir = path.join(tmpDir, 'dist');
+    fs.mkdirSync(distDir);
+    fs.copyFileSync(
+      path.join(__dirname, '../../src/reporter/default.hbs'),
+      path.join(distDir, 'default.hbs'),
+    );
+    const html = toHtml(report, undefined, undefined, undefined, tmpDir);
+    assert.include(html, '项目摘要');
+  });
+
   it('toHtml applies workspace export config', () => {
     const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'code-ai-rate-'));
     const logoPath = path.join(tmpDir, 'logo.png');

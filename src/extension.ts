@@ -256,7 +256,13 @@ async function handleExport(context: vscode.ExtensionContext): Promise<void> {
 
   let content: string;
   try {
-    content = renderExportContent(picked.format, report, config, lastScanResult.workspacePath);
+    content = renderExportContent(
+      picked.format,
+      report,
+      config,
+      lastScanResult.workspacePath,
+      context.extensionPath,
+    );
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     void vscode.window.showErrorMessage(`导出失败: ${message}`);
@@ -281,6 +287,7 @@ function renderExportContent(
   report: ReturnType<typeof buildReport>,
   config: CodeAiRateConfig,
   workspacePath: string,
+  extensionPath: string,
 ): string {
   switch (format) {
     case 'json':
@@ -291,13 +298,13 @@ function renderExportContent(
       const workspaceExportConfig = loadWorkspaceExportConfig(workspacePath);
       const templatePath = config.exportTemplate || undefined;
       try {
-        return toHtml(report, templatePath, workspaceExportConfig, workspacePath);
+        return toHtml(report, templatePath, workspaceExportConfig, workspacePath, extensionPath);
       } catch (err) {
         if (templatePath) {
           void vscode.window.showWarningMessage(
             '自定义 HTML 模板渲染失败，已回退到默认模板。',
           );
-          return toHtml(report, undefined, workspaceExportConfig, workspacePath);
+          return toHtml(report, undefined, workspaceExportConfig, workspacePath, extensionPath);
         }
         throw err;
       }

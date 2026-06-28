@@ -27,6 +27,22 @@ export interface WorkspaceConfigFile {
 
 const DEFAULT_TEMPLATE_PATH = path.join(__dirname, 'default.hbs');
 
+/** 解析默认 HTML 模板路径（打包后位于 dist/default.hbs） */
+function resolveDefaultTemplatePath(extensionPath?: string): string {
+  const candidates: string[] = [];
+  if (extensionPath) {
+    candidates.push(path.join(extensionPath, 'dist', 'default.hbs'));
+    candidates.push(path.join(extensionPath, 'src', 'reporter', 'default.hbs'));
+  }
+  candidates.push(DEFAULT_TEMPLATE_PATH);
+  for (const candidate of candidates) {
+    if (fs.existsSync(candidate)) {
+      return candidate;
+    }
+  }
+  throw new Error('找不到默认 HTML 模板 default.hbs');
+}
+
 /** 从工作区根目录加载 .vscode/code-ai-rate.json */
 export function loadWorkspaceExportConfig(workspacePath: string): WorkspaceExportConfig | undefined {
   const configPath = path.join(workspacePath, '.vscode', 'code-ai-rate.json');
@@ -107,8 +123,12 @@ export function toHtml(
   templatePath?: string,
   workspaceExportConfig?: WorkspaceExportConfig,
   workspacePath?: string,
+  extensionPath?: string,
 ): string {
-  const tplPath = templatePath && fs.existsSync(templatePath) ? templatePath : DEFAULT_TEMPLATE_PATH;
+  const tplPath =
+    templatePath && fs.existsSync(templatePath)
+      ? templatePath
+      : resolveDefaultTemplatePath(extensionPath);
   const source = fs.readFileSync(tplPath, 'utf8');
   const compile = Handlebars.compile(source);
 
