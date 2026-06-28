@@ -5,31 +5,32 @@
  */
 import {
   combineFeatures,
+  computeAiAuthorshipMarkers,
   computeBoilerplateScore,
   computeCommentDensity,
+  computeDefensivePatternScore,
   computeGenericNameRatio,
+  computeStructuralRegularity,
   computeUniformityScore,
+  computeVerboseNamingScore,
   countCodeLines,
   clampScore,
 } from './baseAnalyzer';
 import { FileAnalysis } from '../types';
 
-/** Javadoc 块密度 */
 function computeJavadocScore(source: string): number {
   const blocks = (source.match(/\/\*\*[\s\S]*?\*\//g) ?? []).length;
-  const lines = source.split('\n').length || 1;
-  return clampScore((blocks / lines) * 400);
+  const methods = (source.match(/(?:public|private|protected)\s+\w[\w<>,\s]*\s+\w+\s*\(/g) ?? []).length || 1;
+  return clampScore((blocks / methods) * 90);
 }
 
-/** getter/setter 对数量 */
 function computeGetterSetterScore(source: string): number {
   const getters = (source.match(/public\s+\w+\s+get\w+\s*\(/g) ?? []).length;
   const setters = (source.match(/public\s+void\s+set\w+\s*\(/g) ?? []).length;
   const pairs = Math.min(getters, setters);
-  return clampScore(pairs * 20);
+  return clampScore(pairs * 22);
 }
 
-/** catch 块仅含日志语句 */
 function computeCatchLogScore(source: string): number {
   const catchBlocks = source.match(/catch\s*\([^)]+\)\s*\{[^}]+\}/g) ?? [];
   if (catchBlocks.length === 0) return 0;
@@ -40,24 +41,25 @@ function computeCatchLogScore(source: string): number {
   return clampScore((logOnly / catchBlocks.length) * 100);
 }
 
-/** Service/Impl 后缀命名 */
 function computeServiceImplScore(source: string): number {
-  const serviceImpl = (source.match(/\b\w+(Service|Impl)\b/g) ?? []).length;
-  return clampScore(serviceImpl * 15);
+  const serviceImpl = (source.match(/\b\w+(Service|Impl|Controller|Repository)\b/g) ?? []).length;
+  return clampScore(serviceImpl * 16);
 }
 
 export function analyzeJava(relativePath: string, source: string): FileAnalysis {
   const features = [
-    // 共享特征 40%
-    { name: 'commentDensity', score: computeCommentDensity(source), weight: 0.1 },
-    { name: 'genericNames', score: computeGenericNameRatio(source), weight: 0.1 },
-    { name: 'uniformity', score: computeUniformityScore(source), weight: 0.1 },
-    { name: 'boilerplate', score: computeBoilerplateScore(source), weight: 0.1 },
-    // Java 特有特征 60%
-    { name: 'javadoc', score: computeJavadocScore(source), weight: 0.15 },
-    { name: 'getterSetter', score: computeGetterSetterScore(source), weight: 0.15 },
-    { name: 'catchLog', score: computeCatchLogScore(source), weight: 0.15 },
-    { name: 'serviceImpl', score: computeServiceImplScore(source), weight: 0.15 },
+    { name: 'commentDensity', score: computeCommentDensity(source), weight: 0.07 },
+    { name: 'genericNames', score: computeGenericNameRatio(source), weight: 0.07 },
+    { name: 'uniformity', score: computeUniformityScore(source), weight: 0.07 },
+    { name: 'boilerplate', score: computeBoilerplateScore(source), weight: 0.07 },
+    { name: 'aiMarkers', score: computeAiAuthorshipMarkers(source), weight: 0.1 },
+    { name: 'regularity', score: computeStructuralRegularity(source), weight: 0.08 },
+    { name: 'verboseNaming', score: computeVerboseNamingScore(source), weight: 0.07 },
+    { name: 'defensive', score: computeDefensivePatternScore(source), weight: 0.07 },
+    { name: 'javadoc', score: computeJavadocScore(source), weight: 0.12 },
+    { name: 'getterSetter', score: computeGetterSetterScore(source), weight: 0.12 },
+    { name: 'catchLog', score: computeCatchLogScore(source), weight: 0.08 },
+    { name: 'serviceImpl', score: computeServiceImplScore(source), weight: 0.08 },
   ];
   const { score, topFeatures } = combineFeatures(features);
   return {

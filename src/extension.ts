@@ -160,6 +160,7 @@ async function runScan(): Promise<void> {
 
   sidebarProvider.postScanState('running');
   statusBar.showScanProgress(0);
+  void openResults();
 
   try {
     const rawResult = await scanWorkspace(root, {
@@ -185,6 +186,7 @@ async function runScan(): Promise<void> {
 
     if (result.status === 'completed') {
       statusBar.showResult(result.summary.projectAiRate);
+      await openResults();
     } else if (result.status === 'cancelled') {
       statusBar.hide();
     } else {
@@ -195,6 +197,7 @@ async function runScan(): Promise<void> {
     outputChannel.appendLine(`扫描错误: ${message}`);
     sidebarProvider.postScanState('error');
     statusBar.hide();
+    void openResults();
     void vscode.window.showErrorMessage(`扫描失败: ${message}`);
   } finally {
     isScanning = false;

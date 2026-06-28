@@ -4,18 +4,29 @@
  * @date 2026-06-28
  */
 import { FileAnalysis } from '../types';
+import { analyzeWithSharedFeatures, countCodeLines } from './baseAnalyzer';
 import { analyzeTypescript } from './typescriptAnalyzer';
 import { analyzePython } from './pythonAnalyzer';
 import { analyzeJava } from './javaAnalyzer';
-import { countCodeLines } from './baseAnalyzer';
+
+function extractVueScript(source: string): string {
+  const match = source.match(/<script[^>]*>([\s\S]*?)<\/script>/i);
+  return match?.[1]?.trim() ?? source;
+}
 
 export function analyzeFile(relativePath: string, source: string): FileAnalysis {
   const ext = relativePath.split('.').pop()?.toLowerCase();
-  if (['ts', 'tsx', 'js', 'jsx'].includes(ext ?? '')) {
+  if (['ts', 'tsx', 'js', 'jsx', 'mjs', 'cjs'].includes(ext ?? '')) {
     return analyzeTypescript(relativePath, source);
+  }
+  if (ext === 'vue') {
+    return analyzeTypescript(relativePath, extractVueScript(source));
   }
   if (ext === 'py') return analyzePython(relativePath, source);
   if (ext === 'java') return analyzeJava(relativePath, source);
+  if (['html', 'htm', 'css', 'scss', 'less'].includes(ext ?? '')) {
+    return analyzeWithSharedFeatures(relativePath, source, 'unknown');
+  }
   return {
     relativePath,
     language: 'unknown',

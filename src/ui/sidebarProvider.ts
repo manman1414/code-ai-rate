@@ -66,19 +66,13 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
     webviewView.webview.onDidReceiveMessage(async (message: { type: string; relativePath?: string }) => {
       switch (message.type) {
         case 'scan':
-          if (this.onScanCallback) {
-            await this.onScanCallback();
-          }
+          await vscode.commands.executeCommand('codeAiRate.scanWorkspace');
           break;
         case 'export':
-          if (this.onExportCallback) {
-            await this.onExportCallback();
-          }
+          await vscode.commands.executeCommand('codeAiRate.exportReport');
           break;
         case 'cancel':
-          if (this.onCancelCallback) {
-            await this.onCancelCallback();
-          }
+          await vscode.commands.executeCommand('codeAiRate.cancelScan');
           break;
         case 'openFile':
           if (message.relativePath && this.onOpenFileCallback) {
@@ -87,10 +81,17 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
           break;
       }
     });
+
+    if (this.pendingScanResult) {
+      this.postScanResult(this.pendingScanResult);
+    }
   }
 
-  /** 向 webview 推送扫描结果 */
+  private pendingScanResult?: ScanResult;
+
+  /** 缓存并在 webview 就绪后推送扫描结果 */
   postScanResult(result: ScanResult): void {
+    this.pendingScanResult = result;
     this.workspacePath = result.workspacePath;
     this.postMessage({ type: 'scanResult', payload: result });
   }
@@ -111,10 +112,10 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
 
   private getHtmlForWebview(webview: vscode.Webview, nonce: string): string {
     const styleUri = webview.asWebviewUri(
-      vscode.Uri.joinPath(this.extensionUri, 'src', 'ui', 'webview', 'styles.css'),
+      vscode.Uri.joinPath(this.extensionUri, 'media', 'webview', 'styles.css'),
     );
     const scriptUri = webview.asWebviewUri(
-      vscode.Uri.joinPath(this.extensionUri, 'src', 'ui', 'webview', 'main.js'),
+      vscode.Uri.joinPath(this.extensionUri, 'media', 'webview', 'main.js'),
     );
 
     const disclaimer =
@@ -124,7 +125,7 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
     const csp = [
       `default-src 'none'`,
       `style-src ${webview.cspSource}`,
-      `script-src 'nonce-${nonce}'`,
+      `script-src ${webview.cspSource} 'nonce-${nonce}'`,
     ].join('; ');
 
     return `<!DOCTYPE html>

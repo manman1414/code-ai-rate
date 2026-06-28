@@ -5,6 +5,46 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.12] - 2026-06-28
+
+### Changed
+
+- 扫描开始时自动打开 AI Rate 侧边栏；完成后再次聚焦，便于从命令面板触发后直接查看结果
+
+## [0.1.11] - 2026-06-28
+
+### Fixed
+
+- Activity Bar 图标改回单色 SVG + `fill="currentColor"`（VS Code 将图标当作蒙版，硬编码 `#424242`/`#C5C5C5` 会被忽略导致纯白方块）
+
+## [0.1.10] - 2026-06-28
+
+### Fixed
+
+- Activity Bar 图标改为 VS Code 官方推荐的 light/dark 双色 SVG，修复纯白方块
+
+## [0.1.9] - 2026-06-28
+
+### Changed
+
+- 升级启发式算法至 `1.1.0-heuristic`：新增 AI 标记、结构规整度、现代 TS 类型等特征
+- 项目 AI 率改为行级加权与文件 P75 混合，减少低估
+- 支持 `.vue`、`.html`、`.css` 等文件的共享特征分析
+
+## [0.1.7] - 2026-06-28
+
+### Fixed
+
+- 修复 Webview CSP 未允许加载 `main.js`，导致「开始扫描」按钮无响应
+- 侧边栏按钮改为通过命令触发扫描，更可靠
+
+## [0.1.6] - 2026-06-28
+
+### Fixed
+
+- 侧边栏 Webview 资源移至 `media/webview/`，修复打包后 `.vscodeignore` 排除 `src` 导致面板空白
+- Activity Bar 改用单色 SVG 图标，修复彩色 PNG 显示为白块的问题
+
 ## [0.1.5] - 2026-06-28
 
 ### Changed
