@@ -3,7 +3,7 @@
   "displayName": "Code AI Rate",
   "description": "Locally analyze AI-feature statistics in workspace code",
   "version": "0.1.0",
-  "publisher": "code-ai-rate-dev",
+  "publisher": "manman1414",
   "engines": {
     "vscode": "^1.125.0"
   },
