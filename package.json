@@ -2,7 +2,7 @@
   "name": "code-ai-rate",
   "displayName": "Code AI Rate — AI Feature Statistics / 代码 AI 特征统计",
   "description": "Scan your workspace locally (offline) for AI-style code characteristics. Neutral metrics, compliance reports (JSON/CSV/HTML). 本地离线扫描工作区 AI 特征，中性统计，支持合规报告导出。",
-  "version": "0.1.3",
+  "version": "0.1.5",
   "publisher": "manman1414",
   "repository": {
     "type": "git",
@@ -29,7 +29,7 @@
     "合规"
   ],
   "engines": {
-    "vscode": "^1.125.0"
+    "vscode": "^1.70.0"
   },
   "categories": [
     "Other"
@@ -162,7 +162,7 @@
     "@types/minimatch": "^5.1.2",
     "@types/mocha": "^10.0.10",
     "@types/node": "^26.0.1",
-    "@types/vscode": "^1.125.0",
+    "@types/vscode": "^1.70.0",
     "@vscode/test-electron": "^3.0.0",
     "@vscode/vsce": "^3.9.2",
     "chai": "^6.2.2",

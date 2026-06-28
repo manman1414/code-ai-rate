@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.5] - 2026-06-28
+
+### Changed
+
+- 进一步降低 VS Code 最低版本要求至 `^1.70.0`，兼容更多旧版本
+
+## [0.1.4] - 2026-06-28
+
+### Fixed
+
+- 降低 VS Code 最低版本要求（`^1.125.0` → `^1.85.0`），兼容 1.106.x 等版本
+
 ## [0.1.3] - 2026-06-28
 
 ### Changed
