@@ -8,6 +8,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { aggregateMetrics } from './aggregator/metricsAggregator';
+import { applyBaselineCalibration } from './aggregator/baselineCalibrator';
 import { AUTO_SCAN_DELAY_MS, LARGE_WORKSPACE_FILE_COUNT } from './constants';
 import { CodeAiRateConfig, getExtensionConfig, toScanConfigSnapshot } from './config';
 import { buildReport } from './reporter/reportBuilder';
@@ -128,7 +129,8 @@ function logScanIssues(result: ScanResult): void {
 
 /** 合并聚合指标到扫描结果 */
 function mergeAggregatedMetrics(result: ScanResult, config: CodeAiRateConfig): ScanResult {
-  const aggregated = aggregateMetrics(result.fileDetails, {
+  const calibrated = applyBaselineCalibration(result.fileDetails);
+  const aggregated = aggregateMetrics(calibrated, {
     topN: config.topN,
     highlightThreshold: config.highlightThreshold,
   });

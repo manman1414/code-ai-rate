@@ -16,14 +16,21 @@ export function aggregateMetrics(
   const lineWeighted =
     totalCodeLines === 0 ? 0 : weighted / totalCodeLines;
 
-  // 行级加权 + 文件分数 P75 混合
   const scores = analyzed.map((f) => f.fileScore).sort((a, b) => a - b);
-  const p75Index = Math.min(scores.length - 1, Math.floor(scores.length * 0.75));
-  const p75Score = scores.length > 0 ? scores[p75Index] : 0;
+  const p85Index = Math.min(scores.length - 1, Math.floor(scores.length * 0.85));
+  const p85Score = scores.length > 0 ? scores[p85Index] : 0;
+
+  const sortedByScore = [...analyzed].sort((a, b) => b.fileScore - a.fileScore);
+  const topQuartileCount = Math.max(1, Math.ceil(analyzed.length * 0.25));
+  const topQuartileFiles = sortedByScore.slice(0, topQuartileCount);
+  const topQuartileLines = topQuartileFiles.reduce((s, f) => s + f.codeLines, 0);
+  const topQuartileWeighted = topQuartileFiles.reduce((s, f) => s + f.codeLines * f.fileScore, 0);
+  const topQuartileRate = topQuartileLines === 0 ? 0 : topQuartileWeighted / topQuartileLines;
+
   const projectAiRate =
     totalCodeLines === 0
       ? 0
-      : Math.round((lineWeighted * 0.7 + p75Score * 0.3) * 10) / 10;
+      : Math.round((lineWeighted * 0.45 + p85Score * 0.35 + topQuartileRate * 0.2) * 10) / 10;
 
   const scoreDistribution: Record<'0-30' | '31-60' | '61-100', number> = {
     '0-30': 0,

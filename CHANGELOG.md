@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.15] - 2026-06-28
+
+### Changed
+
+- 升级启发式算法至 `1.3.0-heuristic`
+- 新增复述型注释、空行规律性、catch 只 log 不抛等 P0 特征
+- 新增 FIXME/debug 等人类痕迹降权，降低误报
+- 新增仓库基线校准：相对项目常态偏离的文件获得加分
+
+## [0.1.14] - 2026-06-28
+
+### Changed
+
+- 升级启发式算法至 `1.2.0-heuristic`，提高 AI 特征识别率
+- 新增分节注释、逐步讲解式注释等 AI 常见模式
+- 多特征共振加权：多个中等信号同时出现时抬高文件分数下限
+- 项目 AI 率改为 45% 行加权 + 35% P85 + 20% Top25% 混合，减少被低分文件稀释
+
 ## [0.1.13] - 2026-06-28
 
 ### Fixed

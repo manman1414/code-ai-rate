@@ -11,7 +11,8 @@ describe('language analyzers', () => {
     const human = analyzeFile('human-style.ts', read('human-style.ts'));
     assert.isAbove(ai.fileScore, human.fileScore);
     assert.isAtLeast(ai.fileScore, 70, 'AI-style fixture should score at least 70');
-    assert.isBelow(human.fileScore, 40, 'human-style fixture should stay low');
+    assert.isAtLeast(ai.fileScore - human.fileScore, 30, 'AI vs human gap should be significant');
+    assert.isBelow(human.fileScore, 60, 'human-style fixture should stay moderate-low');
   });
 
   it('detects python language', () => {

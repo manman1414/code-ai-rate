@@ -4,7 +4,6 @@
  * @date 2026-06-28
  */
 import {
-  combineFeatures,
   computeAiAuthorshipMarkers,
   computeBoilerplateScore,
   computeCommentDensity,
@@ -13,6 +12,9 @@ import {
   computeStructuralRegularity,
   computeUniformityScore,
   computeVerboseNamingScore,
+  computeSectionDividerScore,
+  computeLineExplainCommentScore,
+  finalizeFileAnalysis,
   countCodeLines,
   clampScore,
 } from './baseAnalyzer';
@@ -48,25 +50,20 @@ function computeServiceImplScore(source: string): number {
 
 export function analyzeJava(relativePath: string, source: string): FileAnalysis {
   const features = [
-    { name: 'commentDensity', score: computeCommentDensity(source), weight: 0.07 },
-    { name: 'genericNames', score: computeGenericNameRatio(source), weight: 0.07 },
-    { name: 'uniformity', score: computeUniformityScore(source), weight: 0.07 },
-    { name: 'boilerplate', score: computeBoilerplateScore(source), weight: 0.07 },
-    { name: 'aiMarkers', score: computeAiAuthorshipMarkers(source), weight: 0.1 },
-    { name: 'regularity', score: computeStructuralRegularity(source), weight: 0.08 },
-    { name: 'verboseNaming', score: computeVerboseNamingScore(source), weight: 0.07 },
-    { name: 'defensive', score: computeDefensivePatternScore(source), weight: 0.07 },
-    { name: 'javadoc', score: computeJavadocScore(source), weight: 0.12 },
-    { name: 'getterSetter', score: computeGetterSetterScore(source), weight: 0.12 },
-    { name: 'catchLog', score: computeCatchLogScore(source), weight: 0.08 },
-    { name: 'serviceImpl', score: computeServiceImplScore(source), weight: 0.08 },
+    { name: 'commentDensity', score: computeCommentDensity(source), weight: 0.06 },
+    { name: 'genericNames', score: computeGenericNameRatio(source), weight: 0.06 },
+    { name: 'uniformity', score: computeUniformityScore(source), weight: 0.06 },
+    { name: 'boilerplate', score: computeBoilerplateScore(source), weight: 0.06 },
+    { name: 'aiMarkers', score: computeAiAuthorshipMarkers(source), weight: 0.09 },
+    { name: 'regularity', score: computeStructuralRegularity(source), weight: 0.07 },
+    { name: 'verboseNaming', score: computeVerboseNamingScore(source), weight: 0.06 },
+    { name: 'defensive', score: computeDefensivePatternScore(source), weight: 0.06 },
+    { name: 'sectionDivider', score: computeSectionDividerScore(source), weight: 0.07 },
+    { name: 'lineExplain', score: computeLineExplainCommentScore(source), weight: 0.07 },
+    { name: 'javadoc', score: computeJavadocScore(source), weight: 0.11 },
+    { name: 'getterSetter', score: computeGetterSetterScore(source), weight: 0.11 },
+    { name: 'catchLog', score: computeCatchLogScore(source), weight: 0.07 },
+    { name: 'serviceImpl', score: computeServiceImplScore(source), weight: 0.07 },
   ];
-  const { score, topFeatures } = combineFeatures(features);
-  return {
-    relativePath,
-    language: 'java',
-    codeLines: countCodeLines(source),
-    fileScore: score,
-    topFeatures,
-  };
+  return finalizeFileAnalysis(relativePath, source, 'java', features);
 }

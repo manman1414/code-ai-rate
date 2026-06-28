@@ -4,12 +4,24 @@ export interface FeatureContribution {
   weight: number;
 }
 
+/** 单文件风格指标，用于仓库基线校准 */
+export interface FileSignals {
+  commentRatio: number;
+  avgNameLength: number;
+  blankLineRatio: number;
+  restatingComment: number;
+  blankLineRegularity: number;
+  catchSwallow: number;
+  humanTrace: number;
+}
+
 export interface FileAnalysis {
   relativePath: string;
   language: 'typescript' | 'python' | 'java' | 'unknown';
   codeLines: number;
   fileScore: number;
   topFeatures: FeatureContribution[];
+  signals?: FileSignals;
   skipped?: boolean;
   skipReason?: string;
 }

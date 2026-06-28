@@ -10,8 +10,8 @@ const files: FileAnalysis[] = [
 describe('metricsAggregator', () => {
   it('computes line-weighted project AI rate', () => {
     const { summary, topFiles } = aggregateMetrics(files, { topN: 10, highlightThreshold: 70 });
-    // lineWeighted=50, p75=80 → 0.7*50 + 0.3*80 = 59
-    assert.equal(summary.projectAiRate, 59);
+    // lineWeighted=50, p85=80, topQuartile=80 → 0.45*50 + 0.35*80 + 0.2*80 = 66.5
+    assert.equal(summary.projectAiRate, 66.5);
     assert.equal(summary.scoreDistribution['61-100'], 1);
     assert.equal(topFiles[0].relativePath, 'a.ts');
   });

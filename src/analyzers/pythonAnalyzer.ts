@@ -4,7 +4,6 @@
  * @date 2026-06-28
  */
 import {
-  combineFeatures,
   computeAiAuthorshipMarkers,
   computeBoilerplateScore,
   computeCommentDensity,
@@ -13,6 +12,9 @@ import {
   computeStructuralRegularity,
   computeUniformityScore,
   computeVerboseNamingScore,
+  computeSectionDividerScore,
+  computeLineExplainCommentScore,
+  finalizeFileAnalysis,
   countCodeLines,
   clampScore,
 } from './baseAnalyzer';
@@ -40,25 +42,20 @@ function computeMainBlockScore(source: string): number {
 
 export function analyzePython(relativePath: string, source: string): FileAnalysis {
   const features = [
-    { name: 'commentDensity', score: computeCommentDensity(source), weight: 0.07 },
-    { name: 'genericNames', score: computeGenericNameRatio(source), weight: 0.07 },
-    { name: 'uniformity', score: computeUniformityScore(source), weight: 0.07 },
-    { name: 'boilerplate', score: computeBoilerplateScore(source), weight: 0.07 },
-    { name: 'aiMarkers', score: computeAiAuthorshipMarkers(source), weight: 0.1 },
-    { name: 'regularity', score: computeStructuralRegularity(source), weight: 0.08 },
-    { name: 'verboseNaming', score: computeVerboseNamingScore(source), weight: 0.07 },
-    { name: 'defensive', score: computeDefensivePatternScore(source), weight: 0.07 },
-    { name: 'docstrings', score: computeDocstringScore(source), weight: 0.12 },
-    { name: 'typeHints', score: computeTypeHintScore(source), weight: 0.12 },
-    { name: 'separators', score: computeSeparatorScore(source), weight: 0.08 },
-    { name: 'mainBlock', score: computeMainBlockScore(source), weight: 0.08 },
+    { name: 'commentDensity', score: computeCommentDensity(source), weight: 0.06 },
+    { name: 'genericNames', score: computeGenericNameRatio(source), weight: 0.06 },
+    { name: 'uniformity', score: computeUniformityScore(source), weight: 0.06 },
+    { name: 'boilerplate', score: computeBoilerplateScore(source), weight: 0.06 },
+    { name: 'aiMarkers', score: computeAiAuthorshipMarkers(source), weight: 0.09 },
+    { name: 'regularity', score: computeStructuralRegularity(source), weight: 0.07 },
+    { name: 'verboseNaming', score: computeVerboseNamingScore(source), weight: 0.06 },
+    { name: 'defensive', score: computeDefensivePatternScore(source), weight: 0.06 },
+    { name: 'sectionDivider', score: computeSectionDividerScore(source), weight: 0.08 },
+    { name: 'lineExplain', score: computeLineExplainCommentScore(source), weight: 0.07 },
+    { name: 'docstrings', score: computeDocstringScore(source), weight: 0.11 },
+    { name: 'typeHints', score: computeTypeHintScore(source), weight: 0.11 },
+    { name: 'separators', score: computeSeparatorScore(source), weight: 0.07 },
+    { name: 'mainBlock', score: computeMainBlockScore(source), weight: 0.07 },
   ];
-  const { score, topFeatures } = combineFeatures(features);
-  return {
-    relativePath,
-    language: 'python',
-    codeLines: countCodeLines(source),
-    fileScore: score,
-    topFeatures,
-  };
+  return finalizeFileAnalysis(relativePath, source, 'python', features);
 }
