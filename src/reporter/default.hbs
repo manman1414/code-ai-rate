@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Code AI Rate Report — {{report.reportMeta.workspaceName}}</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      color: #333;
+      background: #f5f6f8;
+      line-height: 1.5;
+      padding: 2rem;
+    }
+    .container { max-width: 900px; margin: 0 auto; background: #fff; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); padding: 2rem; }
+    header { border-bottom: 1px solid #e0e0e0; padding-bottom: 1.5rem; margin-bottom: 1.5rem; }
+    header .logo { max-height: 48px; margin-bottom: 0.5rem; }
+    header h1 { font-size: 1.5rem; color: #222; }
+    header .subtitle { color: #888; font-size: 0.9rem; margin-top: 0.25rem; }
+    section { margin-bottom: 2rem; }
+    section h2 { font-size: 1.1rem; color: #444; margin-bottom: 1rem; border-left: 3px solid #4a90d9; padding-left: 0.75rem; }
+    .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 1rem; }
+    .stat-card { background: #f9fafb; border-radius: 6px; padding: 1rem; text-align: center; }
+    .stat-card .value { font-size: 1.5rem; font-weight: 600; color: #4a90d9; }
+    .stat-card .label { font-size: 0.8rem; color: #888; margin-top: 0.25rem; }
+    .rate-bar { background: #e8ecf0; border-radius: 4px; height: 24px; overflow: hidden; margin: 0.5rem 0; }
+    .rate-bar-fill { background: #4a90d9; height: 100%; border-radius: 4px; }
+    .dist-row { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem; }
+    .dist-label { width: 60px; font-size: 0.85rem; color: #666; }
+    .dist-bar { flex: 1; background: #e8ecf0; border-radius: 3px; height: 16px; overflow: hidden; }
+    .dist-bar-fill { background: #4a90d9; height: 100%; border-radius: 3px; }
+    .dist-count { width: 40px; text-align: right; font-size: 0.85rem; color: #888; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+    th, td { padding: 0.6rem 0.75rem; text-align: left; border-bottom: 1px solid #eee; }
+    th { background: #f9fafb; color: #666; font-weight: 500; }
+    td.score { color: #4a90d9; font-weight: 500; }
+    footer { border-top: 1px solid #e0e0e0; padding-top: 1.5rem; margin-top: 1rem; font-size: 0.8rem; color: #888; }
+    footer .disclaimer { margin-bottom: 0.5rem; }
+    footer .meta { color: #aaa; }
+    @media print { body { background: #fff; padding: 0; } .container { box-shadow: none; } }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      {{#if logoBase64}}<img class="logo" src="{{logoBase64}}" alt="Logo" />{{/if}}
+      {{#if customHeader}}<h1>{{customHeader}}</h1>{{else}}<h1>代码 AI 特征统计报告</h1>{{/if}}
+      {{#if companyName}}<p class="subtitle">{{companyName}}</p>{{/if}}
+      <p class="subtitle">{{report.reportMeta.workspaceName}} · {{report.reportMeta.generatedAt}}</p>
+    </header>
+
+    <section>
+      <h2>项目摘要</h2>
+      <div class="summary-grid">
+        <div class="stat-card">
+          <div class="value">{{report.summary.projectAiRate}}%</div>
+          <div class="label">项目 AI 率</div>
+        </div>
+        <div class="stat-card">
+          <div class="value">{{report.summary.analyzedFiles}}</div>
+          <div class="label">已分析文件</div>
+        </div>
+        <div class="stat-card">
+          <div class="value">{{report.summary.totalCodeLines}}</div>
+          <div class="label">代码行数</div>
+        </div>
+        <div class="stat-card">
+          <div class="value">{{report.summary.skippedFiles}}</div>
+          <div class="label">跳过文件</div>
+        </div>
+      </div>
+      <div class="rate-bar" style="margin-top:1rem">
+        <div class="rate-bar-fill" style="width:{{report.summary.projectAiRate}}%"></div>
+      </div>
+    </section>
+
+    <section>
+      <h2>分数分布</h2>
+      <div class="dist-row">
+        <span class="dist-label">0–30</span>
+        <div class="dist-bar"><div class="dist-bar-fill" style="width:{{distPercents.[0-30]}}%"></div></div>
+        <span class="dist-count">{{report.summary.scoreDistribution.[0-30]}}</span>
+      </div>
+      <div class="dist-row">
+        <span class="dist-label">31–60</span>
+        <div class="dist-bar"><div class="dist-bar-fill" style="width:{{distPercents.[31-60]}}%"></div></div>
+        <span class="dist-count">{{report.summary.scoreDistribution.[31-60]}}</span>
+      </div>
+      <div class="dist-row">
+        <span class="dist-label">61–100</span>
+        <div class="dist-bar"><div class="dist-bar-fill" style="width:{{distPercents.[61-100]}}%"></div></div>
+        <span class="dist-count">{{report.summary.scoreDistribution.[61-100]}}</span>
+      </div>
+    </section>
+
+    <section>
+      <h2>AI 占比较高文件</h2>
+      <table>
+        <thead>
+          <tr><th>路径</th><th>语言</th><th>分数</th><th>代码行</th></tr>
+        </thead>
+        <tbody>
+          {{#each topFiles}}
+          <tr>
+            <td>{{relativePath}}</td>
+            <td>{{language}}</td>
+            <td class="score">{{fileScore}}</td>
+            <td>{{codeLines}}</td>
+          </tr>
+          {{/each}}
+        </tbody>
+      </table>
+    </section>
+
+    <footer>
+      {{#if customFooter}}<p class="disclaimer">{{customFooter}}</p>{{/if}}
+      <p class="disclaimer">{{report.reportMeta.disclaimer}}</p>
+      <p class="meta">
+        算法版本 {{report.reportMeta.analyzerVersion}} ·
+        扩展版本 {{report.reportMeta.extensionVersion}} ·
+        扫描耗时 {{report.reportMeta.scanDurationMs}}ms ·
+        状态 {{report.reportMeta.scanStatus}}
+      </p>
+    </footer>
+  </div>
+</body>
+</html>
