@@ -5,7 +5,7 @@
   "version": "0.1.0",
   "publisher": "code-ai-rate-dev",
   "engines": {
-    "vscode": "^1.85.0"
+    "vscode": "^1.125.0"
   },
   "categories": [
     "Other"
@@ -124,12 +124,12 @@
   "scripts": {
     "compile": "node esbuild.js",
     "watch": "node esbuild.js --watch",
-    "test": "mocha -r ts-node/register 'test/**/*.test.ts'",
-    "package": "npm run compile && vsce package"
+    "test": "mocha -r ./test/register.js \"test/**/*.test.ts\"",
+    "package": "npm run compile && vsce package --allow-missing-repository --no-rewrite-relative-links"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "directories": {
     "doc": "docs"
   },
