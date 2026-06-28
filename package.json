@@ -1,0 +1,155 @@
+{
+  "name": "code-ai-rate",
+  "displayName": "Code AI Rate",
+  "description": "Locally analyze AI-feature statistics in workspace code",
+  "version": "0.1.0",
+  "publisher": "code-ai-rate-dev",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onStartupFinished",
+    "onView:codeAiRate.sidebar"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "codeAiRate.scanWorkspace",
+        "title": "Code AI Rate: Scan Workspace"
+      },
+      {
+        "command": "codeAiRate.exportReport",
+        "title": "Code AI Rate: Export Report"
+      },
+      {
+        "command": "codeAiRate.cancelScan",
+        "title": "Code AI Rate: Cancel Scan"
+      },
+      {
+        "command": "codeAiRate.openResults",
+        "title": "Code AI Rate: Open Results"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "codeAiRate",
+          "title": "AI Rate",
+          "icon": "media/icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "codeAiRate": [
+        {
+          "type": "webview",
+          "id": "codeAiRate.sidebar",
+          "name": "AI Rate"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Code AI Rate",
+      "properties": {
+        "codeAiRate.autoScanOnOpen": {
+          "type": "boolean",
+          "default": false
+        },
+        "codeAiRate.includePatterns": {
+          "type": "array",
+          "default": [
+            "**/*"
+          ],
+          "items": {
+            "type": "string"
+          }
+        },
+        "codeAiRate.excludePatterns": {
+          "type": "array",
+          "default": [
+            "**/node_modules/**",
+            "**/dist/**",
+            "**/build/**",
+            "**/.git/**",
+            "**/*.min.js",
+            "**/package-lock.json",
+            "**/yarn.lock",
+            "**/pnpm-lock.yaml"
+          ],
+          "items": {
+            "type": "string"
+          }
+        },
+        "codeAiRate.highlightThreshold": {
+          "type": "number",
+          "default": 70,
+          "minimum": 0,
+          "maximum": 100
+        },
+        "codeAiRate.exportTemplate": {
+          "type": "string",
+          "default": ""
+        },
+        "codeAiRate.exportFields": {
+          "type": "array",
+          "default": [
+            "reportMeta",
+            "summary",
+            "topFiles",
+            "fileDetails"
+          ],
+          "items": {
+            "type": "string"
+          }
+        },
+        "codeAiRate.disclaimerText": {
+          "type": "string",
+          "default": "本报告基于启发式统计，仅供参考，不构成任何判定依据。"
+        },
+        "codeAiRate.maxFileSizeKB": {
+          "type": "number",
+          "default": 1024
+        },
+        "codeAiRate.topN": {
+          "type": "number",
+          "default": 20
+        }
+      }
+    }
+  },
+  "scripts": {
+    "compile": "node esbuild.js",
+    "watch": "node esbuild.js --watch",
+    "test": "mocha -r ts-node/register 'test/**/*.test.ts'",
+    "package": "npm run compile && vsce package"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "directories": {
+    "doc": "docs"
+  },
+  "devDependencies": {
+    "@types/chai": "^5.2.3",
+    "@types/minimatch": "^5.1.2",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^26.0.1",
+    "@types/vscode": "^1.125.0",
+    "@vscode/test-electron": "^3.0.0",
+    "@vscode/vsce": "^3.9.2",
+    "chai": "^6.2.2",
+    "esbuild": "^0.28.1",
+    "mocha": "^11.7.6",
+    "ts-node": "^10.9.2",
+    "typescript": "^6.0.3"
+  },
+  "dependencies": {
+    "handlebars": "^4.7.9",
+    "ignore": "^7.0.5",
+    "minimatch": "^10.2.5"
+  }
+}
