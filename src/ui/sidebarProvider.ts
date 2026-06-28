@@ -4,7 +4,6 @@
  * @date 2026-06-28
  */
 
-import * as path from 'path';
 import * as vscode from 'vscode';
 import { ScanResult, ScanStatus } from '../types';
 
@@ -14,6 +13,8 @@ export type ScanCallback = () => void | Promise<void>;
 export type ExportCallback = () => void | Promise<void>;
 /** 取消扫描回调 */
 export type CancelCallback = () => void | Promise<void>;
+/** 打开文件回调 */
+export type OpenFileCallback = (relativePath: string) => void | Promise<void>;
 
 export class SidebarProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = 'codeAiRate.sidebar';
@@ -22,6 +23,7 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
   private onScanCallback?: ScanCallback;
   private onExportCallback?: ExportCallback;
   private onCancelCallback?: CancelCallback;
+  private onOpenFileCallback?: OpenFileCallback;
   private workspacePath = '';
 
   constructor(private readonly extensionUri: vscode.Uri) {}
@@ -39,6 +41,11 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
   /** 注册取消回调 */
   setOnCancel(callback: CancelCallback): void {
     this.onCancelCallback = callback;
+  }
+
+  /** 注册打开文件回调 */
+  setOnOpenFile(callback: OpenFileCallback): void {
+    this.onOpenFileCallback = callback;
   }
 
   resolveWebviewView(
@@ -74,8 +81,8 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
           }
           break;
         case 'openFile':
-          if (message.relativePath) {
-            await this.handleOpenFile(message.relativePath);
+          if (message.relativePath && this.onOpenFileCallback) {
+            await this.onOpenFileCallback(message.relativePath);
           }
           break;
       }
@@ -100,16 +107,6 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
 
   private postMessage(message: unknown): void {
     void this.view?.webview.postMessage(message);
-  }
-
-  private async handleOpenFile(relativePath: string): Promise<void> {
-    const folder = vscode.workspace.workspaceFolders?.[0];
-    const basePath = this.workspacePath || folder?.uri.fsPath;
-    if (!basePath) {
-      return;
-    }
-    const fileUri = vscode.Uri.file(path.join(basePath, relativePath));
-    await vscode.window.showTextDocument(fileUri);
   }
 
   private getHtmlForWebview(webview: vscode.Webview, nonce: string): string {
